@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Manage Links</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Pacifico&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+            rel="stylesheet"
+        />
+        <link href="./css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="centered">
+            <h1>Manage Links</h1>
+            <h2>📊</h2>
+            <p id="message"></p>
+            <div id="list-of-links"><i>Loading...</i></div>
+            <p>
+                <a href="/" class="btn">Home</a>
+            </p>
+        </div>
+        <script>
+            class ShortenedLink extends HTMLElement {
+                constructor() {
+                    super()
+                }
+                #setDOM() {
+                    this.innerHTML = ''
+                    let details = document.createElement('details')
+                    let summary = document.createElement('summary')
+                    let shortAnchor = document.createElement("a");
+                    let longAnchor = document.createElement('a')
+                    let deleteForm = document.createElement('form')
+                    let delInput = document.createElement('input')
+                    let submit = document.createElement('button')
+                    let fullDisplayURL = this.href //default on a long string
+                    try {
+                        fullDisplayURL = new URL(this.href).hostname //attempt to shorten that string
+                    } catch (e) {} //do noting since we already have a string we can use
+                    let displayURL =
+                        fullDisplayURL.length > 20
+                            ? fullDisplayURL.substring(0, 17) + '...'
+                            : fullDisplayURL
+                    summary.innerText = `${this.shortid} (${displayURL})`
+                    shortAnchor.href = `/${this.shortid}`
+                    shortAnchor.innerText = this.shortid
+                    longAnchor.href = this.href
+                    longAnchor.innerText = this.href
+                    longAnchor.target = '_blank'
+                    deleteForm.method = 'post'
+                    delInput.type = 'hidden'
+                    delInput.name = 'id'
+                    delInput.value = this.shortid
+                    delInput.style.display = 'none'
+                    submit.type = 'submit'
+                    submit.innerText = 'delete'
+                    deleteForm.appendChild(delInput)
+                    deleteForm.appendChild(submit)
+                    details.appendChild(summary)
+                    details.appendChild(shortAnchor)
+                    details.appendChild(longAnchor)
+                    details.appendChild(deleteForm)
+                    this.appendChild(details)
+                }
+                get href() {
+                    return this.getAttribute('href')
+                }
+                set href(val) {
+                    this.setAttribute('href', val)
+                    this.#setDOM()
+                }
+                get shortid() {
+                    return this.getAttribute('shortid')
+                }
+                set shortid(val) {
+                    this.setAttribute('shortid', val)
+                    this.#setDOM()
+                }
+            }
+            window.customElements.define('shortened-link', ShortenedLink)
+            ;(function() {
+                let container = document.querySelector('#list-of-links')
+                fetch('/list')
+                    .then(resp => resp.json())
+                    .then(data => {
+                        //data is one object, so we must turn it into an array
+                        var sortArray = []
+                        Object.keys(data).forEach(key => {
+                            sortArray.push([key, data[key]])
+                        })
+                        sortArray.sort((a, b) => {
+                            let sort1 = a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0
+                            let sort2 = a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0
+                            return sort1 || sort2
+                        })
+                        container.innerHTML = ''
+                        for (const [key, value] of sortArray) {
+                            let elem = document.createElement('shortened-link')
+                            elem.href = value
+                            elem.shortid = key
+                            container.appendChild(elem)
+                        }
+                    })
+                    .catch(e => {
+                        document.querySelector('#message').innerText =
+                            e.message || e.toString()
+                    })
+            })()
+        </script>
+    </body>
+</html>

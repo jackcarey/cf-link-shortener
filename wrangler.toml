@@ -1,0 +1,12 @@
+account_id = ""
+zone_id = ""
+routes = ["example.com/*"]
+name = "cf-link-shortener"
+type = "webpack"
+workers_dev = true
+site = { bucket = "./public" }
+
+[[kv_namespaces]]
+binding = "SHORTENED_LINKS"
+preview_id = "abc123"
+id = "abc456"

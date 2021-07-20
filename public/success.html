@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Success</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Pacifico&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+            rel="stylesheet"
+        />
+        <link href="./css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="centered">
+            <h1>Success</h1>
+            <h2>✅</h2>
+            <p id="success"></p>
+            <p>
+                <a href="/" class="btn">Home</a>
+            </p>
+        </div>
+        <script>
+            ;(function() {
+                let url = new URL(window.location.href)
+                let msg = url.searchParams.get('msg')
+                let id = url.searchParams.get('id')
+                if (msg) {
+                    let elem = document.querySelector('#success')
+                    if (elem) {
+                        elem.innerHTML = msg.trim()
+                    }
+                }
+                if (id) {
+                    let elem = document.querySelector('#success')
+                    if (elem) {
+                        let a = document.createElement('a')
+                        a.href = `/${id}`
+                        a.innerText = id
+                        a.target = '_blank'
+                        a.className = 'short-link'
+                        elem.appendChild(a)
+                    }
+                }
+            })()
+        </script>
+    </body>
+</html>
